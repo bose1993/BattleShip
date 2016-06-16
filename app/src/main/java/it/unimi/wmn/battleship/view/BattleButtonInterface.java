@@ -21,8 +21,8 @@ import android.widget.Button;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public interface BattleButtonInterface {
-    public static final String ENEMYBOARD = "EB";
-    public static final String MYBOARD = "MB";
-    public void callModel();
-    public void addListener(Button b);
+    String ENEMYBOARD = "EB";
+    String MYBOARD = "MB";
+    void callModel();
+    void addListener(Button b);
 }

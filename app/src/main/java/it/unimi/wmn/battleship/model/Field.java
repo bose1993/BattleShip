@@ -34,14 +34,15 @@ public class Field extends Observable {
      * Class Constructor: set Field to Empty
      */
     public Field(){
-        this.Value=this.EMPTY;
+        this.Value=Field.EMPTY;
     }
 
     /**
-     * Class Constructor: set Field to user given type
+     *
      * @param Type
+     * @throws AlreadyExistingBoatException
      */
-    void Field(String Type) throws AlreadyExistingBoatException {
+    Field(String Type) throws AlreadyExistingBoatException {
         this.setField(Type);
     }
 
@@ -56,10 +57,9 @@ public class Field extends Observable {
     /**
      * Set Field Type
      * Possible Field type are:Empty,Boat,HitBoat
-     * @param Type
      */
     public void setField(String Type) throws InputMismatchException {
-        if(Type == this.EMPTY || Type==this.BOAT || Type==this.HITBOAT || Type== this.SINK){
+        if(Type.equals(Field.EMPTY) || Type.equals(Field.BOAT) || Type.equals(Field.HITBOAT) || Type.equals(Field.SINK)){
             this.Value=Type;
             this.setChanged();
             this.notifyObservers();

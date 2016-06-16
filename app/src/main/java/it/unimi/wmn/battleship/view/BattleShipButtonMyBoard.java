@@ -2,17 +2,13 @@ package it.unimi.wmn.battleship.view;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.Observable;
 import java.util.Observer;
 
-import it.unimi.wmn.battleship.R;
 import it.unimi.wmn.battleship.controller.Game;
 import it.unimi.wmn.battleship.controller.GameBoard;
 import it.unimi.wmn.battleship.model.AlreadyExistingBoatException;
@@ -42,7 +38,7 @@ public class BattleShipButtonMyBoard extends Button implements Observer,BattleBu
     int row;
     int column;
     String type;
-    Drawable defaultBackgroud;
+
     BattleShipButtonMyBoard(final int row, final int column, String Type, Context ctx){
         super(ctx);
         this.row = row;
@@ -64,17 +60,22 @@ public class BattleShipButtonMyBoard extends Button implements Observer,BattleBu
         GameBoard gb = Game.getGameBoard();
         String status = gb.getValueOfField(this.row,this.column,this.type);
         Log.d("BATTLEBUTTON",status);
-        if(status.equals(Field.SINK)){
-            this.setBackgroundResource(android.R.drawable.btn_default_small);
-            this.setBackgroundColor(Color.RED);
-        }else if (status.equals(Field.HITBOAT)){
-            this.setBackgroundResource(android.R.drawable.btn_default_small);
-            this.setBackgroundColor(Color.YELLOW);
-        }else if (status.equals(Field.BOAT)){
-            this.setBackgroundResource(android.R.drawable.btn_default_small);
-            this.setBackgroundColor(Color.GREEN);
-        }else if (status.equals(Field.EMPTY)){
-            this.setBackgroundResource(android.R.drawable.btn_default_small);
+        switch (status) {
+            case Field.SINK:
+                this.setBackgroundResource(android.R.drawable.btn_default_small);
+                this.setBackgroundColor(Color.RED);
+                break;
+            case Field.HITBOAT:
+                this.setBackgroundResource(android.R.drawable.btn_default_small);
+                this.setBackgroundColor(Color.YELLOW);
+                break;
+            case Field.BOAT:
+                this.setBackgroundResource(android.R.drawable.btn_default_small);
+                this.setBackgroundColor(Color.GREEN);
+                break;
+            case Field.EMPTY:
+                this.setBackgroundResource(android.R.drawable.btn_default_small);
+                break;
         }
     }
 
@@ -83,14 +84,11 @@ public class BattleShipButtonMyBoard extends Button implements Observer,BattleBu
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(type.equals(BattleShipButtonMyBoard.MYBOARD)){
-                    GameBoard gb = Game.getGameBoard();
                     try {
                         Game.getBoatFactory().createBoat(row,column);
                         //gb.Print();
                         Log.d("BATTLEBUTTON",row+ " "+column);
-                    } catch (BoatOutOfFieldException e) {
-
-                    } catch (AlreadyExistingBoatException e) {
+                    } catch (BoatOutOfFieldException | AlreadyExistingBoatException e) {
                         e.printStackTrace();
                     }
                 }else if (type.equals(BattleShipButtonMyBoard.ENEMYBOARD)){
