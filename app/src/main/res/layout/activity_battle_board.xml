@@ -1,0 +1,43 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.BattleBoard">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="4">
+        <LinearLayout
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:background="#0099cc"
+            android:layout_weight="2">
+            <GridLayout
+                android:layout_width="match_parent"
+                android:id="@+id/mBoard"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill_horizontal">
+            </GridLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:background="#d0fcfc12"
+            android:layout_weight="2">
+            <GridLayout
+                android:layout_width="match_parent"
+                android:id="@+id/mBoardEnemy"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill_horizontal">
+            </GridLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
