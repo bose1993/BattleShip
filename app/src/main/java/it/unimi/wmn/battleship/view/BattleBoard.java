@@ -122,7 +122,8 @@ import it.unimi.wmn.battleship.model.ShootResponse;
         super.onCreate(savedInstanceState);
 
         GameBoard gb = Game.getGameBoard();
-
+        Game.getBluetoothWrapper().setCtx(getApplicationContext());
+        Game.getBluetoothWrapper().on(this);
         ShootResponse s = gb.Shoot(3,3);
         Log.d("BATTLE BOARD",s.getStatus());
 

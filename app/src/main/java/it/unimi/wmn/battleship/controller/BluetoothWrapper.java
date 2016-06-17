@@ -1,5 +1,13 @@
 package it.unimi.wmn.battleship.controller;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
 import it.unimi.wmn.battleship.model.ShootResponse;
 
 /**
@@ -21,6 +29,29 @@ import it.unimi.wmn.battleship.model.ShootResponse;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class BluetoothWrapper implements BattleshipComunicationWrapper {
+    private Context ctx;
+    private BluetoothAdapter BA;
+
+    public BluetoothWrapper() {
+        this.BA = BluetoothAdapter.getDefaultAdapter();
+        Log.d("BTWrapper","Setting Up BTAdapter");
+    }
+
+    public void setCtx(Context ctx) {
+        this.ctx = ctx;
+    }
+
+    public void on(Activity a){
+        if (!this.BA.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            a.startActivityForResult(turnOn, 0);
+            Toast.makeText(ctx," BT Turned on",Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            Toast.makeText(ctx,"BT Already on", Toast.LENGTH_LONG).show();
+        }
+    }
     @Override
     public void sendShootInfo(int r, int c) {
         this.reciveShootInfo(Game.getGameBoard().Shoot(r,c));
