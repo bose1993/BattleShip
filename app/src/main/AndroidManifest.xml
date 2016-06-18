@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".view.BattleBoard"
+            android:name=".view.Menu"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme">
@@ -22,7 +22,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.BTNearbyDevice"></activity>
+        <activity android:name=".view.BTNearbyDevice" />
+        <activity android:name=".view.BattleBoard" />
+        <activity
+            android:name=".view.ChooseEnemy"
+            android:label="@string/title_activity_choose_enemy"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

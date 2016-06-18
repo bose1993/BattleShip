@@ -8,10 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.util.Observable;
+import java.util.Set;
 
 import it.unimi.wmn.battleship.model.ShootResponse;
 
@@ -33,12 +34,15 @@ import it.unimi.wmn.battleship.model.ShootResponse;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class BluetoothWrapper implements BattleshipComunicationWrapper {
+public class BluetoothWrapper extends Observable implements BattleshipComunicationWrapper {
+    public static final Object NEW_PAIRED_DEVICE = "NEW_PAIRED_DEVICE";
     private Context ctx;
     private BluetoothAdapter BA;
+    Set<BluetoothDevice> pairedDevices;
 
     public BluetoothWrapper() {
         this.BA = BluetoothAdapter.getDefaultAdapter();
+        this.getPairedDevice();
         Log.d("BTWrapper","Setting Up BTAdapter");
     }
 
@@ -63,6 +67,28 @@ public class BluetoothWrapper implements BattleshipComunicationWrapper {
     public BluetoothAdapter getAdapter(){
         return this.BA;
     }
+
+    private void getPairedDevice(){
+        this.pairedDevices = this.BA.getBondedDevices();
+        // If there are paired devices
+        if (this.pairedDevices.size() > 0) {
+            // Loop through paired devices
+            for (BluetoothDevice device : this.pairedDevices) {
+                // Add the name and address to an array adapter to show in a ListView
+               Log.d("BTWrapper",device.getName() + "\n" + device.getAddress());
+            }
+        }
+    }
+
+    public boolean checkIfPaired(String address){
+        for (BluetoothDevice device : this.pairedDevices) {
+            if(device.getAddress().equals(address)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public boolean isEnable(){
         return this.BA.isEnabled();
@@ -99,9 +125,11 @@ public class BluetoothWrapper implements BattleshipComunicationWrapper {
                 final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
                 final int prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
                 if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
+                    getPairedDevice();
+                    notifyObservers(BluetoothWrapper.NEW_PAIRED_DEVICE);
                     Toast.makeText(ctx,"Paired", Toast.LENGTH_LONG).show();
                 } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED){
-                    Toast.makeText(ctx,"Upaired", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx,"Unpaired", Toast.LENGTH_LONG).show();
                 }
             }
         }

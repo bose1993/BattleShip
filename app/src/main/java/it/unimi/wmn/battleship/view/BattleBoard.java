@@ -1,7 +1,6 @@
 package it.unimi.wmn.battleship.view;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,8 +15,7 @@ import android.widget.GridLayout;
 import it.unimi.wmn.battleship.R;
 import it.unimi.wmn.battleship.controller.Game;
 import it.unimi.wmn.battleship.controller.GameBoard;
-import it.unimi.wmn.battleship.model.BoatOutOfFieldException;
-import it.unimi.wmn.battleship.model.ShootResponse;
+
 
 /**
  * Created by ebosetti on 16/06/2016.
@@ -122,8 +120,7 @@ import it.unimi.wmn.battleship.model.ShootResponse;
         super.onCreate(savedInstanceState);
 
         GameBoard gb = Game.getGameBoard();
-        Intent intent = new Intent(this, BTNearbyDevice.class);
-        startActivity(intent);
+
     }
 
 

@@ -16,23 +16,27 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.TreeMap;
 
 import it.unimi.wmn.battleship.R;
+import it.unimi.wmn.battleship.controller.BluetoothWrapper;
 import it.unimi.wmn.battleship.controller.Game;
 
-public class BTNearbyDevice extends AppCompatActivity {
+public class BTNearbyDevice extends AppCompatActivity implements Observer {
 
     private ListView listView;
-    private ArrayList<String> mDeviceList = new ArrayList<String>();
-
-
+    private ArrayList<String> mDeviceList = new ArrayList<>();
+    private Map<Integer,BluetoothDevice> deviceList = new TreeMap<>();
+    private ArrayAdapter<String> listAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_btnearby_device);
-
+        Game.getBluetoothWrapper().addObserver(this);
         listView = (ListView) findViewById(R.id.listView);
-
         Game.getBluetoothWrapper().setCtx(getApplicationContext());
         Game.getBluetoothWrapper().on(this);
         Game.getBluetoothWrapper().startDiscover();
@@ -41,6 +45,15 @@ public class BTNearbyDevice extends AppCompatActivity {
         registerReceiver(mReceiver, filter);
         IntentFilter discoveryFinisced = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mDiscFinisced, discoveryFinisced);
+        this.listAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, mDeviceList);
+        listView.setAdapter(listAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("BTNearbyDevice","Press"+position);
+                Game.getBluetoothWrapper().pairDevice(deviceList.get(position));
+            }
+        });
 
 
     }
@@ -63,6 +76,21 @@ public class BTNearbyDevice extends AppCompatActivity {
             startActivity(discoverableIntent);
         }
     }
+    private void deviceDiscovered(BluetoothDevice bd){
+        String deviceStatus;
+        if(Game.getBluetoothWrapper().checkIfPaired(bd.getAddress())){
+            deviceStatus = "Paired";
+        }else{
+            deviceStatus = "Not Paired";
+        }
+        String s = bd.getName() + "\n" + bd.getAddress();
+        mDeviceList.add(s);
+        this.deviceList.put(mDeviceList.indexOf(s), bd);
+
+        this.listAdapter.notifyDataSetChanged();
+        Log.i("BT", bd.getName() + "\n" + bd.getAddress());
+    }
+
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -70,17 +98,7 @@ public class BTNearbyDevice extends AppCompatActivity {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 final BluetoothDevice device = intent
                         .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                mDeviceList.add(device.getName() + "\n" + device.getAddress());
-                Log.i("BT", device.getName() + "\n" + device.getAddress());
-                listView.setAdapter(new ArrayAdapter<String>(context,
-                        android.R.layout.simple_list_item_1, mDeviceList));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.d("BTNearbyDevice","Press"+position);
-                        Game.getBluetoothWrapper().pairDevice(device);
-                    }
-                });
+                deviceDiscovered(device);
             }
         }
     };
@@ -92,4 +110,18 @@ public class BTNearbyDevice extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    public void update(Observable observable, Object data) {
+        Log.d("BTNearby","Update From Controller");
+        String typeUpdate = (String) data;
+        if(data.equals(BluetoothWrapper.NEW_PAIRED_DEVICE)){
+            this.mDeviceList.clear();
+           for(Map.Entry<Integer,BluetoothDevice> entry : this.deviceList.entrySet()) {
+                Integer key = entry.getKey();
+                BluetoothDevice value = entry.getValue();
+                this.deviceDiscovered(value);
+            }
+        }
+    }
 }
