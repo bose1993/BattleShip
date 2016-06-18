@@ -1,12 +1,12 @@
 package it.unimi.wmn.battleship.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -122,23 +122,8 @@ import it.unimi.wmn.battleship.model.ShootResponse;
         super.onCreate(savedInstanceState);
 
         GameBoard gb = Game.getGameBoard();
-        Game.getBluetoothWrapper().setCtx(getApplicationContext());
-        Game.getBluetoothWrapper().on(this);
-        ShootResponse s = gb.Shoot(3,3);
-        Log.d("BATTLE BOARD",s.getStatus());
-
-        s = gb.Shoot(3,4);
-        Log.d("BATTLE BOARD",s.getStatus());
-
-        s = gb.Shoot(3,5);
-        Log.d("BATTLE BOARD",s.getStatus());
-
-        s = gb.Shoot(3,6);
-        Log.d("BATTLE BOARD",s.getStatus());
-
-        s = gb.Shoot(3,7);
-        Log.d("BATTLE BOARD",s.getStatus());
-
+        Intent intent = new Intent(this, BTNearbyDevice.class);
+        startActivity(intent);
     }
 
 

@@ -2,11 +2,16 @@ package it.unimi.wmn.battleship.controller;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import java.lang.reflect.Method;
 
 import it.unimi.wmn.battleship.model.ShootResponse;
 
@@ -39,6 +44,8 @@ public class BluetoothWrapper implements BattleshipComunicationWrapper {
 
     public void setCtx(Context ctx) {
         this.ctx = ctx;
+        IntentFilter intent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        ctx.registerReceiver(mPairReceiver, intent);
     }
 
     public void on(Activity a){
@@ -52,6 +59,53 @@ public class BluetoothWrapper implements BattleshipComunicationWrapper {
             Toast.makeText(ctx,"BT Already on", Toast.LENGTH_LONG).show();
         }
     }
+
+    public BluetoothAdapter getAdapter(){
+        return this.BA;
+    }
+
+    public boolean isEnable(){
+        return this.BA.isEnabled();
+    }
+
+    public void startDiscover(){
+        this.BA.startDiscovery();
+    }
+
+    public void pairDevice(BluetoothDevice device) {
+        try {
+            Method method = device.getClass().getMethod("createBond", (Class[]) null);
+            method.invoke(device, (Object[]) null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void unpairDevice(BluetoothDevice device) {
+        try {
+            Method method = device.getClass().getMethod("removeBond", (Class[]) null);
+            method.invoke(device, (Object[]) null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private final BroadcastReceiver mPairReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+                final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
+                final int prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
+                if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
+                    Toast.makeText(ctx,"Paired", Toast.LENGTH_LONG).show();
+                } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED){
+                    Toast.makeText(ctx,"Upaired", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    };
     @Override
     public void sendShootInfo(int r, int c) {
         this.reciveShootInfo(Game.getGameBoard().Shoot(r,c));

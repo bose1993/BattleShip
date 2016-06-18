@@ -60,7 +60,7 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
     public void callModel(){
         GameBoard gb = Game.getGameBoard();
         String status = gb.getValueOfField(this.row,this.column,this.type);
-        Log.d("BATTLEBUTTON",status);
+        //Log.d("BATTLEBUTTON",status);
         switch (status) {
             case Field.SINK:
                 this.setBackgroundResource(android.R.drawable.btn_default_small);
