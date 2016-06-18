@@ -7,6 +7,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -39,6 +42,7 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
     private Context ctx;
     private BluetoothAdapter BA;
     Set<BluetoothDevice> pairedDevices;
+    private BluetoothService BS;
 
     public BluetoothWrapper() {
         this.BA = BluetoothAdapter.getDefaultAdapter();
@@ -51,7 +55,20 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
         IntentFilter intent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         ctx.registerReceiver(mPairReceiver, intent);
     }
-
+    public void startBluetoothServer(){
+        if(this.BS!=null) {
+            this.BS.start();
+        }else{
+            this.BS = new BluetoothService(ctx,null);
+            this.BS.start();
+        }
+    }
+    public BluetoothService getBluetoothService() {
+        if(this.BS==null){
+            this.BS = new BluetoothService(ctx,null);
+        }
+        return BS;
+    }
     public void on(Activity a){
         if (!this.BA.isEnabled()) {
             Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -134,6 +151,47 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
             }
         }
     };
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case BluetoothService.MESSAGE_STATE_CHANGE:
+                    switch (msg.arg1) {
+                        case BluetoothService.STATE_CONNECTED:
+                            //setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
+                            //mConversationArrayAdapter.clear();
+                            break;
+                        case BluetoothService.STATE_CONNECTING:
+                            //setStatus(R.string.title_connecting);
+                            break;
+                        case BluetoothService.STATE_LISTEN:
+                        case BluetoothService.STATE_NONE:
+                            //setStatus(R.string.title_not_connected);
+                            break;
+                    }
+                    break;
+                case BluetoothService.MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+                    // construct a string from the buffer
+                    String writeMessage = new String(writeBuf);
+                    //mConversationArrayAdapter.add("Me:  " + writeMessage);
+                    break;
+                case BluetoothService.MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    //mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
+                    break;
+                case BluetoothService.MESSAGE_DEVICE_NAME:
+                    //TODO
+                case BluetoothService.UI_MESSAGE:
+                    //TODO
+                    break;
+            }
+        }
+    };
+
     @Override
     public void sendShootInfo(int r, int c) {
         this.reciveShootInfo(Game.getGameBoard().Shoot(r,c));

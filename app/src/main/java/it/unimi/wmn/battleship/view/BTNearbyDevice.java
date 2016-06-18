@@ -44,7 +44,7 @@ public class BTNearbyDevice extends AppCompatActivity implements Observer {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
         IntentFilter discoveryFinisced = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        registerReceiver(mDiscFinisced, discoveryFinisced);
+        registerReceiver(mDiscFinisched, discoveryFinisced);
         this.listAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, mDeviceList);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -62,7 +62,7 @@ public class BTNearbyDevice extends AppCompatActivity implements Observer {
     @Override
     protected void onDestroy() {
         unregisterReceiver(mReceiver);
-        unregisterReceiver(mDiscFinisced);
+        unregisterReceiver(mDiscFinisched);
         super.onDestroy();
 
 
@@ -103,7 +103,7 @@ public class BTNearbyDevice extends AppCompatActivity implements Observer {
         }
     };
 
-    private final BroadcastReceiver mDiscFinisced = new BroadcastReceiver() {
+    private final BroadcastReceiver mDiscFinisched = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(getApplicationContext(),"Discovery Process Finished", Toast.LENGTH_LONG).show();
 

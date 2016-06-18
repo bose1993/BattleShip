@@ -8,10 +8,12 @@ import android.view.View;
 import android.widget.Button;
 
 import it.unimi.wmn.battleship.R;
+import it.unimi.wmn.battleship.controller.BluetoothService;
+import it.unimi.wmn.battleship.controller.Game;
 
 public class Menu extends AppCompatActivity {
     private Button playBtn;
-    private Button listBtn;
+    private Button ServerBtn;
     private Button pairBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +28,20 @@ public class Menu extends AppCompatActivity {
             }
         });
 
-        this.listBtn = (Button)findViewById(R.id.ViewPaired);
-        this.listBtn.setOnClickListener(new View.OnClickListener() {
-
+        this.ServerBtn = (Button)findViewById(R.id.StartServer);
+        this.ServerBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO List alla Paired Device.
+
+                if(Game.getBluetoothWrapper().getBluetoothService().getState()==BluetoothService.STATE_NONE){
+                    ServerBtn.setText("Stop Play Server");
+                    Game.getBluetoothWrapper().getBluetoothService().start();
+                }else{
+                    ServerBtn.setText("Start a Play Server");
+                    Game.getBluetoothWrapper().getBluetoothService().stop();
+                }
             }
+
         });
 
         this.pairBtn = (Button)findViewById(R.id.Find);
