@@ -4,15 +4,16 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 import java.util.TreeMap;
 
-import it.unimi.wmn.battleship.model.BluetoothMessage;
 import it.unimi.wmn.battleship.model.Boat;
 import it.unimi.wmn.battleship.model.Field;
 import it.unimi.wmn.battleship.model.RequestBoatOfEmptyFieldException;
 import it.unimi.wmn.battleship.model.ShootResponse;
+import it.unimi.wmn.battleship.view.BattleBoard;
 
 /**
  * Created by ebosetti on 09/06/2016.
@@ -32,7 +33,7 @@ import it.unimi.wmn.battleship.model.ShootResponse;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class GameBoard {
+public class GameBoard extends Observable {
 
     private static final String TAG = "GameBoard";
 
@@ -90,6 +91,9 @@ public class GameBoard {
     private void changeGameStatus(int status){
         Log.d(TAG,this.status+"-->"+status);
         this.status=status;
+        this.setChanged();
+        this.notifyObservers(Constants.GAME_STATUS_CHANGED);
+
     }
 
     public void ChangeFieldStatus(int r, int c, String state, Boat b){
@@ -107,6 +111,8 @@ public class GameBoard {
         }
     }
 
+
+
     public void receiveNonce(int nonce){
         this.grm.setEnemyNonce(nonce);
         if (this.getStatus()==GameBoard.STATUS_DECIDE_FISRST_SHOOT) {
@@ -116,26 +122,43 @@ public class GameBoard {
         }
     }
 
+    public void sendShoot(int r, int c){
+        if(this.status== GameBoard.STATUS_SHOOT){
+            Game.getBluetoothWrapper().sendShootInfo(r,c);
 
-
-    public ShootResponse reciveEnemyShoot(int r, int c){
-        if(this.Board[r][c].getField().equals(Field.BOAT)){
-            this.Board[r][c].setField(Field.HITBOAT);
-            try {
-                Boat b = this.Board[r][c].getBoat();
-                if(b.checkIfSink()){
-                    return new ShootResponse(r,c,ShootResponse.SINK,b.getId());
-                }else{
-                    return new ShootResponse(r,c,ShootResponse.HIT,b.getId());
-                }
-            } catch (RequestBoatOfEmptyFieldException e) {
-                e.printStackTrace();
-            }
+        }else{
+            this.changeGameStatus(GameBoard.STATUS_WAIT_SHOOT);
         }
-        return new ShootResponse(r,c,ShootResponse.MISS,-1);
+
     }
 
-    public void recieveEnemyShootResponse(ShootResponse sr){
+    private void sendShootResponse(ShootResponse sr){
+        Game.getBluetoothWrapper().sendShootResponseInfo(sr.getColumn(),sr.getRow(),sr.getStatus(),sr.getBoatid());
+        this.changeGameStatus(GameBoard.STATUS_SHOOT);
+    }
+
+    public void receiveEnemyShoot(int r, int c){
+        ShootResponse sr;
+        try {
+            if(this.Board[r][c].getField().equals(Field.BOAT)){
+                this.Board[r][c].setField(Field.HITBOAT);
+                Boat b = this.Board[r][c].getBoat();
+                if(b.checkIfSink()){
+                    sr = new ShootResponse(r,c,ShootResponse.SINK,b.getId());
+                }else{
+                    sr = new ShootResponse(r,c,ShootResponse.HIT,b.getId());
+                }
+                this.sendShootResponse(sr);
+            }else {
+                sr = new ShootResponse(r, c, ShootResponse.MISS, -1);
+            }
+            this.sendShootResponse(sr);
+        } catch (RequestBoatOfEmptyFieldException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void receiveEnemyShootResponse(ShootResponse sr){
         switch (sr.getStatus()) {
             case ShootResponse.HIT:
                 if(this.EnemyBoatList.containsKey(sr.getBoatid())){
@@ -154,9 +177,12 @@ public class GameBoard {
                 this.EmenyBoard[sr.getRow()][sr.getColumn()].setField(Field.SINK);
                 break;
             case ShootResponse.MISS:
-                this.EmenyBoard[sr.getRow()][sr.getColumn()].setField(Field.EMPTY);
+                this.EmenyBoard[sr.getRow()][sr.getColumn()].setField(Field.MISS);
                 break;
+
         }
+
+        this.changeGameStatus(GameBoard.STATUS_WAIT_SHOOT);
     }
 
     public void insertObserverOfField(int row, int column, Observer o){

@@ -22,17 +22,17 @@ public class ShootResponse {
 
     private int row;
     private int column;
-    private String  status;
+    private int  status;
     private int boatid;
-    public static final String HIT = "HIT";
-    public static final String MISS = "MISS";
-    public static final String SINK = "SINK";
+    public static final int HIT = 0;
+    public static final int MISS = 1;
+    public static final int SINK = 2;
 
-    public ShootResponse(int row, int column, String status, int boatid) {
+    public ShootResponse(int row, int column, int status, int boatid) {
         this.setRow(row);
         this.setColumn(column);
         this.setStatus(status);
-        if(status.equals(ShootResponse.MISS)){
+        if(status == ShootResponse.MISS){
             this.boatid=-1;
         }else {
             this.boatid = boatid;
@@ -55,11 +55,11 @@ public class ShootResponse {
         this.column = column;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    private void setStatus(String status) {
+    private void setStatus(int status) {
         this.status = status;
     }
 

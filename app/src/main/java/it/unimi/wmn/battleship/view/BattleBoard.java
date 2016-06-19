@@ -10,9 +10,14 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.GridLayout;
+import android.widget.Toast;
 
+
+import java.util.Observable;
+import java.util.Observer;
 
 import it.unimi.wmn.battleship.R;
+import it.unimi.wmn.battleship.controller.Constants;
 import it.unimi.wmn.battleship.controller.Game;
 import it.unimi.wmn.battleship.controller.GameBoard;
 
@@ -35,7 +40,7 @@ import it.unimi.wmn.battleship.controller.GameBoard;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-    public class BattleBoard extends AppCompatActivity {
+    public class BattleBoard extends AppCompatActivity implements Observer {
         /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -115,6 +120,7 @@ import it.unimi.wmn.battleship.controller.GameBoard;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_battle_board);
+        Game.getGameBoard().addObserver(this);
         this.CreateGridofBattleBoard();
         this.CreateEnemyGridBattleBoard();
         super.onCreate(savedInstanceState);
@@ -226,7 +232,14 @@ import it.unimi.wmn.battleship.controller.GameBoard;
         mHideHandler.removeCallbacks(mShowPart2Runnable);
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
     }
+    @Override
+    public void onDestroy(){
+        if(Game.getBluetoothWrapper().getBluetoothService()!=null){
+            Game.getBluetoothWrapper().getBluetoothService().stop();
+        }
+        super.onDestroy();
 
+    }
     @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
@@ -245,5 +258,19 @@ import it.unimi.wmn.battleship.controller.GameBoard;
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        if(data.equals(Constants.GAME_STATUS_CHANGED)){
+            int status = Game.getGameBoard().getStatus();
+            if(status == GameBoard.STATUS_SHOOT){
+                Toast.makeText(getApplicationContext(),"Tocca a te sparare", Toast.LENGTH_LONG).show();
+
+            }else if(status == GameBoard.STATUS_WAIT_SHOOT){
+                Toast.makeText(getApplicationContext(),"In attesa dell'avversario", Toast.LENGTH_SHORT).show();
+
+            }
+        }
     }
 }

@@ -16,6 +16,7 @@ import java.util.Observer;
 
 import it.unimi.wmn.battleship.R;
 import it.unimi.wmn.battleship.controller.BluetoothWrapper;
+import it.unimi.wmn.battleship.controller.Constants;
 import it.unimi.wmn.battleship.controller.Game;
 
 public class ChooseEnemy extends AppCompatActivity implements Observer {
@@ -54,7 +55,7 @@ public class ChooseEnemy extends AppCompatActivity implements Observer {
 
     @Override
     public void update(Observable observable, Object data) {
-        if(data.equals(BluetoothWrapper.CONNECTION_SUCCESFUL)){
+        if(data.equals(Constants.CONNECTION_SUCCESFUL)){
             startGameClientRole();
         }
     }

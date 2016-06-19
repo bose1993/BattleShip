@@ -27,6 +27,7 @@ public class Field extends Observable {
     public final static String BOAT = "Boat";
     public final static String HITBOAT = "HitBoat";
     public final static String SINK = "Sink";
+    public final static String MISS = "Miss";
     private String Value;
     private Boat boat;
 
@@ -59,7 +60,7 @@ public class Field extends Observable {
      * Possible Field type are:Empty,Boat,HitBoat
      */
     public void setField(String Type) throws InputMismatchException {
-        if(Type.equals(Field.EMPTY) || Type.equals(Field.BOAT) || Type.equals(Field.HITBOAT) || Type.equals(Field.SINK)){
+        if(Type.equals(Field.EMPTY) || Type.equals(Field.BOAT) || Type.equals(Field.HITBOAT) || Type.equals(Field.SINK) || Type.equals(Field.MISS)){
             this.Value=Type;
             this.setChanged();
             this.notifyObservers();

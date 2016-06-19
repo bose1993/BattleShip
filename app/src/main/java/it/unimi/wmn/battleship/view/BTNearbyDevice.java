@@ -23,6 +23,7 @@ import java.util.TreeMap;
 
 import it.unimi.wmn.battleship.R;
 import it.unimi.wmn.battleship.controller.BluetoothWrapper;
+import it.unimi.wmn.battleship.controller.Constants;
 import it.unimi.wmn.battleship.controller.Game;
 
 public class BTNearbyDevice extends AppCompatActivity implements Observer {
@@ -115,7 +116,7 @@ public class BTNearbyDevice extends AppCompatActivity implements Observer {
     public void update(Observable observable, Object data) {
         Log.d("BTNearby","Update From Controller");
         String typeUpdate = (String) data;
-        if(data.equals(BluetoothWrapper.NEW_PAIRED_DEVICE)){
+        if(data.equals(Constants.NEW_PAIRED_DEVICE)){
             this.mDeviceList.clear();
            for(Map.Entry<Integer,BluetoothDevice> entry : this.deviceList.entrySet()) {
                 Integer key = entry.getKey();

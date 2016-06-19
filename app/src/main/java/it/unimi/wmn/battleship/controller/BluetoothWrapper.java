@@ -48,20 +48,19 @@ import it.unimi.wmn.battleship.model.ShootResponse;
 public class BluetoothWrapper extends Observable implements BattleshipComunicationWrapper {
     private static final String TAG = "BluetoothWrapper";
 
-    public static final String NEW_PAIRED_DEVICE = "NEW_PAIRED_DEVICE";
-    public static final String CONNECTION_SUCCESFUL = "CONNECTION_SUCCESFUL";
+
     private Context ctx;
     private BluetoothAdapter BA;
     private  final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case BluetoothService.MESSAGE_STATE_CHANGE:
+                case Constants.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
                             Log.d(TAG,"Connected");
                             setChanged();
-                            notifyObservers(CONNECTION_SUCCESFUL);
+                            notifyObservers(Constants.CONNECTION_SUCCESFUL);
                             break;
                         case BluetoothService.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
@@ -72,23 +71,20 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
                             break;
                     }
                     break;
-                case BluetoothService.MESSAGE_WRITE:
+                case Constants.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
                     //mConversationArrayAdapter.add("Me:  " + writeMessage);
                     Log.d("BTWrapperWrite",writeMessage);
                     break;
-                case BluetoothService.MESSAGE_READ:
+                case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     reciveInfo(readBuf);
                     Log.d("BTWrapperRead",readBuf.toString());
                     break;
-                case BluetoothService.MESSAGE_DEVICE_NAME:
+                case Constants.MESSAGE_DEVICE_NAME:
                     //TODO
-                case BluetoothService.UI_MESSAGE:
-                    //TODO
-                    break;
             }
         }
     };
@@ -113,7 +109,7 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
     }
     public BluetoothService getBluetoothService() {
         if(this.BS==null){
-            this.BS = new BluetoothService(mHandler);
+            this.BS = new BluetoothService(ctx,mHandler);
         }
         return BS;
     }
@@ -183,7 +179,7 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
                 final int prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
                 if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
                     updatePairedDevice();
-                    notifyObservers(BluetoothWrapper.NEW_PAIRED_DEVICE);
+                    notifyObservers(Constants.NEW_PAIRED_DEVICE);
                     Toast.makeText(ctx,"Paired", Toast.LENGTH_LONG).show();
                 } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED){
                     Toast.makeText(ctx,"Unpaired", Toast.LENGTH_LONG).show();
@@ -192,16 +188,28 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
         }
     };
 
-    public void reciveShootInfo(ShootResponse sr) {
-        Game.getGameBoard().recieveEnemyShootResponse(sr);
+    public void sendShootInfo(int r, int c) {
+        BluetoothMessage m = new BluetoothMessage();
+        m.setType(BluetoothMessage.SHOOT);
+        m.setColumn(c);
+        m.setRow(r);
+        this.sendInfo(m);
+    }
 
-        //TODO Delete these method
-
-
+    public void sendShootResponseInfo(int c,int r, int status,int boatId){
+        BluetoothMessage m = new BluetoothMessage();
+        m.setType(BluetoothMessage.SHOOT_RESPONSE);
+        m.setColumn(c);
+        m.setRow(r);
+        m.setShootStatus(status);
+        m.setPayload(new Integer(boatId));
+        this.sendInfo(m);
     }
 
     @Override
     public void sendInfo(BluetoothMessage m) {
+
+        //TODO Make this method private & check where used
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
         try {
@@ -265,6 +273,12 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
     private void doActivityIncomingMessage(BluetoothMessage bm){
         if (bm.getType()==BluetoothMessage.DECIDE_FIRST_SHOOT){
             Game.getGameBoard().receiveNonce((Integer)(bm.getPayload()));
+        }else if (bm.getType()==BluetoothMessage.SHOOT){
+            Log.d(TAG,"Receive Shoot");
+            Game.getGameBoard().receiveEnemyShoot(bm.getRow(),bm.getColumn());
+        }else if (bm.getType()==BluetoothMessage.SHOOT_RESPONSE){
+            Log.d(TAG,"Receive Shoot Repsonse");
+            Game.getGameBoard().receiveEnemyShootResponse(new ShootResponse(bm.getRow(),bm.getColumn(),bm.getShootStatus(),(Integer)bm.getPayload()));
         }
     }
 }

@@ -22,6 +22,8 @@ import java.io.Serializable;
  */
 public class BluetoothMessage implements Serializable {
     public static final int DECIDE_FIRST_SHOOT = 0;
+    public static final int SHOOT = 1;
+    public static final int SHOOT_RESPONSE = 2;
 
 
     private int type;

@@ -13,6 +13,7 @@ import java.util.Observer;
 import it.unimi.wmn.battleship.R;
 import it.unimi.wmn.battleship.controller.BluetoothService;
 import it.unimi.wmn.battleship.controller.BluetoothWrapper;
+import it.unimi.wmn.battleship.controller.Constants;
 import it.unimi.wmn.battleship.controller.Game;
 
 public class Menu extends AppCompatActivity implements Observer {
@@ -38,7 +39,7 @@ public class Menu extends AppCompatActivity implements Observer {
             @Override
             public void onClick(View v) {
 
-                if(Game.getBluetoothWrapper().getBluetoothService().getState()==BluetoothService.STATE_NONE){
+                if(Game.getBluetoothWrapper().getBluetoothService().getState()== BluetoothService.STATE_NONE){
                     ServerBtn.setText("Stop Play Server");
                     Game.getBluetoothWrapper().getBluetoothService().start();
                 }else{
@@ -66,7 +67,7 @@ public class Menu extends AppCompatActivity implements Observer {
 
     @Override
     public void update(Observable observable, Object data) {
-        if(data.equals(BluetoothWrapper.CONNECTION_SUCCESFUL)){
+        if(data.equals(Constants.CONNECTION_SUCCESFUL)){
             startGameServerRole();
         }
     }

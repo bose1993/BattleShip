@@ -40,7 +40,7 @@ public class GameRoundManager {
         BluetoothMessage m = new BluetoothMessage();
         m.setType(BluetoothMessage.DECIDE_FIRST_SHOOT);
         m.setPayload(new Integer(this.MyNonce));
-        if(Game.getBluetoothWrapper().getBluetoothService().getState()==BluetoothService.STATE_CONNECTED){
+        if(Game.getBluetoothWrapper().getBluetoothService().getState()== BluetoothService.STATE_CONNECTED){
             Game.getBluetoothWrapper().sendInfo(m);
         }else{
             Log.d(TAG,"Error Socket not connected");

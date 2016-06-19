@@ -77,6 +77,9 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
             case Field.EMPTY:
                 this.setBackgroundResource(android.R.drawable.btn_default_small);
                 break;
+            case Field.MISS:
+                this.setBackgroundColor(Color.BLUE);
+                break;
         }
     }
 
@@ -92,7 +95,7 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
                         e.printStackTrace();
                     }
                 }else if (type.equals(BattleShipButtonEnemyBoard.ENEMYBOARD)){
-                    //Game.getBluetoothWrapper().sendInfo(row,column);
+                    Game.getGameBoard().sendShoot(row,column);
                 }
             }
         });
