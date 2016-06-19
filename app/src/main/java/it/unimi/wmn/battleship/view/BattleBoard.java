@@ -118,9 +118,6 @@ import it.unimi.wmn.battleship.controller.GameBoard;
         this.CreateGridofBattleBoard();
         this.CreateEnemyGridBattleBoard();
         super.onCreate(savedInstanceState);
-
-        GameBoard gb = Game.getGameBoard();
-
     }
 
 

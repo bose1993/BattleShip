@@ -42,16 +42,21 @@ public class BoatFactory {
     }
 
     public void createBoat(int row, int column) throws BoatOutOfFieldException, AlreadyExistingBoatException {
-        if(!this.availableBoatDimension.empty()) {
+        if(!this.availableBoatDimension.empty()&& Game.getGameBoard().getStatus()==GameBoard.STATUS_BOAT_POSITIONING) {
             Integer dim = this.availableBoatDimension.pop();
-
             try {
                 this.SetBoat(row, column, dim);
+                if(this.availableBoatDimension.empty()){
+                    Game.getGameBoard().allBoatPositioned();
+
+                }
             } catch (AlreadyExistingBoatException e) {
                 this.availableBoatDimension.push(dim);
-                throw new AlreadyExistingBoatException("Overlapping Boat");            }
+                throw new AlreadyExistingBoatException("Overlapping Boat");
+            }
 
         }
+
     }
 
     private void SetBoat(int r, int c, int boatDim) throws BoatOutOfFieldException, AlreadyExistingBoatException {

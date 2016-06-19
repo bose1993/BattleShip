@@ -7,11 +7,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import it.unimi.wmn.battleship.R;
 import it.unimi.wmn.battleship.controller.BluetoothService;
+import it.unimi.wmn.battleship.controller.BluetoothWrapper;
 import it.unimi.wmn.battleship.controller.Game;
 
-public class Menu extends AppCompatActivity {
+public class Menu extends AppCompatActivity implements Observer {
     private Button playBtn;
     private Button ServerBtn;
     private Button pairBtn;
@@ -19,6 +23,7 @@ public class Menu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+        Game.getBluetoothWrapper().addObserver(this);
         this.playBtn = (Button)findViewById(R.id.Play);
         this.playBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -57,5 +62,17 @@ public class Menu extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        if(data.equals(BluetoothWrapper.CONNECTION_SUCCESFUL)){
+            startGameServerRole();
+        }
+    }
+
+    private void startGameServerRole(){
+        Intent intent = new Intent(getApplicationContext(),BattleBoard.class);
+        startActivity(intent);
     }
 }

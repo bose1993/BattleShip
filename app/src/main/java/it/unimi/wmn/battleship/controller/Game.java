@@ -1,5 +1,9 @@
 package it.unimi.wmn.battleship.controller;
 
+import android.content.Intent;
+
+import it.unimi.wmn.battleship.view.BattleBoard;
+
 /**
  * Created by ebosetti on 09/06/2016.
  *
@@ -51,5 +55,7 @@ public class Game {
         }
         return br;
     }
+
+
 
 }

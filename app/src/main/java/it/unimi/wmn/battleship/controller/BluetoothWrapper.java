@@ -12,14 +12,19 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.lang.reflect.Method;
 import java.util.Observable;
 import java.util.Set;
 
+import it.unimi.wmn.battleship.model.BluetoothMessage;
 import it.unimi.wmn.battleship.model.ShootResponse;
 
 /**
@@ -41,7 +46,10 @@ import it.unimi.wmn.battleship.model.ShootResponse;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class BluetoothWrapper extends Observable implements BattleshipComunicationWrapper {
-    public static final Object NEW_PAIRED_DEVICE = "NEW_PAIRED_DEVICE";
+    private static final String TAG = "BluetoothWrapper";
+
+    public static final String NEW_PAIRED_DEVICE = "NEW_PAIRED_DEVICE";
+    public static final String CONNECTION_SUCCESFUL = "CONNECTION_SUCCESFUL";
     private Context ctx;
     private BluetoothAdapter BA;
     private  final Handler mHandler = new Handler() {
@@ -51,9 +59,9 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
                 case BluetoothService.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
-                            //setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-                            //mConversationArrayAdapter.clear();
-                            sendShootInfo(1,1);
+                            Log.d(TAG,"Connected");
+                            setChanged();
+                            notifyObservers(CONNECTION_SUCCESFUL);
                             break;
                         case BluetoothService.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
@@ -69,13 +77,12 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
                     //mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    Log.d("BTWrapperRead",writeMessage);
+                    Log.d("BTWrapperWrite",writeMessage);
                     break;
                 case BluetoothService.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-                    // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    Log.d("BTWrapperRead",readMessage);
+                    reciveInfo(readBuf);
+                    Log.d("BTWrapperRead",readBuf.toString());
                     break;
                 case BluetoothService.MESSAGE_DEVICE_NAME:
                     //TODO
@@ -96,7 +103,7 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
     public BluetoothWrapper() {
         this.BA = BluetoothAdapter.getDefaultAdapter();
         this.updatePairedDevice();
-        Log.d("BTWrapper","Setting Up BTAdapter");
+        Log.d(TAG,"Setting Up BTAdapter");
     }
 
     public void setCtx(Context ctx) {
@@ -185,17 +192,22 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
         }
     };
 
+    public void reciveShootInfo(ShootResponse sr) {
+        Game.getGameBoard().recieveEnemyShootResponse(sr);
 
+        //TODO Delete these method
+
+
+    }
 
     @Override
-    public void sendShootInfo(int r, int c) {
-        Log.d("BTWrapper","Sending Shoot Info");
-        //this.reciveShootInfo(Game.getGameBoard().Shoot(r,c));
+    public void sendInfo(BluetoothMessage m) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
         try {
             out = new ObjectOutputStream(bos);
-            out.writeObject("Test");
+            out.writeObject(m);
+            Log.d(TAG,"Sending Message");
             byte[] BytesObj = bos.toByteArray();
             this.getBluetoothService().write(BytesObj);
         } catch (IOException e) {
@@ -206,20 +218,53 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
                     out.close();
                 }
             } catch (IOException ex) {
-                // ignore close exception
+                ex.printStackTrace();
             }
             try {
                 bos.close();
             } catch (IOException ex) {
-                // ignore close exception
+                ex.printStackTrace();
             }
         }
     }
 
     @Override
-    public void reciveShootInfo(ShootResponse sr) {
-        Game.getGameBoard().EnemyShootResponse(sr);
+    public BluetoothMessage reciveInfo(byte[] b) {
+        Log.d(TAG,"Entering Method Recive Message");
+        ByteArrayInputStream bis = new ByteArrayInputStream(b);
+        ObjectInput in = null;
+        try {
+            in = new ObjectInputStream(bis);
+            BluetoothMessage o = (BluetoothMessage) in.readObject();
+            Log.d(TAG,"MESSAGE TYPE"+String.valueOf(o.getType()));
+            Log.d(TAG,String.valueOf(o.getPayload()));
+            this.doActivityIncomingMessage(o);
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bis.close();
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+        return null;
+    }
 
-
+    private void doActivityIncomingMessage(BluetoothMessage bm){
+        if (bm.getType()==BluetoothMessage.DECIDE_FIRST_SHOOT){
+            Game.getGameBoard().receiveNonce((Integer)(bm.getPayload()));
+        }
     }
 }

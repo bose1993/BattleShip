@@ -5,8 +5,10 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Observer;
+import java.util.Random;
 import java.util.TreeMap;
 
+import it.unimi.wmn.battleship.model.BluetoothMessage;
 import it.unimi.wmn.battleship.model.Boat;
 import it.unimi.wmn.battleship.model.Field;
 import it.unimi.wmn.battleship.model.RequestBoatOfEmptyFieldException;
@@ -32,25 +34,40 @@ import it.unimi.wmn.battleship.model.ShootResponse;
  */
 public class GameBoard {
 
-
+    private static final String TAG = "GameBoard";
 
     public static final String ENEMYBOARD = "EB";
     public static final String MYBOARD = "MB";
 
-    Field[][] Board;
-    Field[][] EmenyBoard;
-    ArrayList<Boat> BoatList;
-    Map<Integer, Boat> EnemyBoatList = new TreeMap<Integer, Boat>();
 
+    public static final int STATUS_BOAT_POSITIONING = 0;
+    public static final int STATUS_DECIDE_FISRST_SHOOT = 1;
+    public static final int STATUS_SHOOT = 2;
+    public static final int STATUS_WAIT_SHOOT = 3;
+    public static final int STATUS_WAITING_SHOOT_RESPONSE = 4;
+    public static final int STATUS_GAME_ENDED = 5;
+
+    private Field[][] Board;
+    private Field[][] EmenyBoard;
+    private ArrayList<Boat> BoatList;
+    private Map<Integer, Boat> EnemyBoatList = new TreeMap<Integer, Boat>();
+
+    private GameRoundManager grm;
+
+    public int getStatus() {
+        return status;
+    }
+
+    private int status;
 
     /**
      * Constructor of the class: Set the Gameboard to alla Empty
      */
 
      public GameBoard(){
-        Log.d("GameBoard","Board Contructor");
-        this.BoatList = new ArrayList<>();
-        this.Board = new Field[10][10];
+         this.BoatList = new ArrayList<>();
+         this.Board = new Field[10][10];
+         this.grm = new GameRoundManager();
         for (int i=0;i<10;i++){
             for (int j=0;j<10;j++){
                 // Set field to empty
@@ -66,6 +83,13 @@ public class GameBoard {
              }
          }
 
+         this.changeGameStatus(STATUS_BOAT_POSITIONING);
+
+    }
+
+    private void changeGameStatus(int status){
+        Log.d(TAG,this.status+"-->"+status);
+        this.status=status;
     }
 
     public void ChangeFieldStatus(int r, int c, String state, Boat b){
@@ -73,8 +97,28 @@ public class GameBoard {
         this.Board[r][c].setBoat(b);
     }
 
+    public void allBoatPositioned(){
+        this.changeGameStatus(STATUS_DECIDE_FISRST_SHOOT);
+        this.grm.sendNonce();
+        if (this.grm.existEnemyNonce()){
+            //Check if enemy has just set all boat & send nonce or wait
+            int round = this.grm.getRound();
+            this.changeGameStatus(round);
+        }
+    }
 
-    public ShootResponse Shoot(int r, int c){
+    public void receiveNonce(int nonce){
+        this.grm.setEnemyNonce(nonce);
+        if (this.getStatus()==GameBoard.STATUS_DECIDE_FISRST_SHOOT) {
+            //Check if all boat are positioned or wait the position of all boat to change the status
+            int round = this.grm.getRound();
+            this.changeGameStatus(round);
+        }
+    }
+
+
+
+    public ShootResponse reciveEnemyShoot(int r, int c){
         if(this.Board[r][c].getField().equals(Field.BOAT)){
             this.Board[r][c].setField(Field.HITBOAT);
             try {
@@ -91,7 +135,7 @@ public class GameBoard {
         return new ShootResponse(r,c,ShootResponse.MISS,-1);
     }
 
-    public void EnemyShootResponse(ShootResponse sr){
+    public void recieveEnemyShootResponse(ShootResponse sr){
         switch (sr.getStatus()) {
             case ShootResponse.HIT:
                 if(this.EnemyBoatList.containsKey(sr.getBoatid())){

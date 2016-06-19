@@ -87,13 +87,12 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
                 if(type.equals(BattleShipButtonEnemyBoard.MYBOARD)){
                     try {
                         Game.getBoatFactory().createBoat(row,column);
-                        //gb.Print();
                         Log.d("BATTLEBUTTON",row+ " "+column);
                     } catch (BoatOutOfFieldException | AlreadyExistingBoatException e) {
                         e.printStackTrace();
                     }
                 }else if (type.equals(BattleShipButtonEnemyBoard.ENEMYBOARD)){
-                    Game.getBluetoothWrapper().sendShootInfo(row,column);
+                    //Game.getBluetoothWrapper().sendInfo(row,column);
                 }
             }
         });

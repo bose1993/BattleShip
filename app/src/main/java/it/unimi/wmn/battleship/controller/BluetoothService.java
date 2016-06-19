@@ -31,10 +31,9 @@ public class BluetoothService {
     private static final String NAME_INSECURE = "BluetoothChatInsecure";
 
     // Unique UUID for this application
-    private static final UUID MY_UUID_SECURE =
-            UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
-    private static final UUID MY_UUID_INSECURE =
-            UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    //private static final UUID MY_UUID_SECURE =  UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+    private static final UUID MY_UUID_INSECURE =  UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    private static final UUID MY_UUID_SECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -112,8 +111,8 @@ public class BluetoothService {
 
         // Start the thread to listen on a BluetoothServerSocket
         if (mSecureAcceptThread == null) {
-            mSecureAcceptThread = new AcceptThread(true);
-            mSecureAcceptThread.start();
+            //mSecureAcceptThread = new AcceptThread(true);
+            //mSecureAcceptThread.start();
         }
         if (mInsecureAcceptThread == null) {
             mInsecureAcceptThread = new AcceptThread(false);
@@ -273,7 +272,7 @@ public class BluetoothService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
          *///TODO
-
+        Log.e(TAG,"Connection Lost");
         // Start the service over to restart listening mode
         BluetoothService.this.start();
     }
@@ -497,11 +496,11 @@ public class BluetoothService {
             try {
                 mmOutStream.write(buffer);
 
-                // Share the sent message back to the UI Activity
-                /**
-                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
+
+
+                mHandler.obtainMessage(BluetoothService.MESSAGE_WRITE, -1, -1, buffer)
                         .sendToTarget();
-                 */ // TODO
+
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }
