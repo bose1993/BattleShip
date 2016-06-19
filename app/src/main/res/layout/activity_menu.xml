@@ -35,10 +35,10 @@
 
 
     <Button
-        android:id="@+id/ViewPaired"
+        android:id="@+id/StartServer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ViewPaired" />
+        android:text="@string/StartServer" />
 
     <Button
         android:id="@+id/Find"

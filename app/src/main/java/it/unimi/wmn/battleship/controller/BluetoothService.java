@@ -60,10 +60,9 @@ public class BluetoothService {
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
-     * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public BluetoothService(Context context, Handler handler) {
+    public BluetoothService(Handler handler) {
         mAdapter = Game.getBluetoothWrapper().getAdapter();
         mState = STATE_NONE;
         mHandler = handler;
@@ -80,8 +79,7 @@ public class BluetoothService {
         mState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        //TODO
-        //mHandler.obtainMessage(SyncStateContract.Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        mHandler.obtainMessage(BluetoothService.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
     /**
@@ -190,11 +188,11 @@ public class BluetoothService {
 
         // Send the name of the connected device back to the UI Activity
 
-        //Message msg = mHandler.obtainMessage(.Constants.MESSAGE_DEVICE_NAME);
-        //Bundle bundle = new Bundle();
-        //bundle.putString("", device.getName());
-        //msg.setData(bundle);
-        //mHandler.sendMessage(msg);
+        Message msg = mHandler.obtainMessage(BluetoothService.MESSAGE_DEVICE_NAME);
+        Bundle bundle = new Bundle();
+        bundle.putString("Name", device.getName());
+        msg.setData(bundle);
+        mHandler.sendMessage(msg);
 
         setState(STATE_CONNECTED);
         //TODO
@@ -475,12 +473,11 @@ public class BluetoothService {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
-
+                    Log.d(TAG,"ReadingBytes");
                     // Send the obtained bytes to the UI Activity
-                    /*
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
+                    mHandler.obtainMessage(BluetoothService.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
-                            */ //TODO
+
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();

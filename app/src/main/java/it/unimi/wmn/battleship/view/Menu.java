@@ -24,8 +24,8 @@ public class Menu extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                //TODO Choose from Paired device the enemy.
-            }
+                Intent intent = new Intent(getApplicationContext(), ChooseEnemy.class);
+                startActivity(intent);            }
         });
 
         this.ServerBtn = (Button)findViewById(R.id.StartServer);

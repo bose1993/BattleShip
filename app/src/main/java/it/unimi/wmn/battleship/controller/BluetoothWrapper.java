@@ -9,10 +9,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.util.Observable;
 import java.util.Set;
@@ -41,12 +44,58 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
     public static final Object NEW_PAIRED_DEVICE = "NEW_PAIRED_DEVICE";
     private Context ctx;
     private BluetoothAdapter BA;
+    private  final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case BluetoothService.MESSAGE_STATE_CHANGE:
+                    switch (msg.arg1) {
+                        case BluetoothService.STATE_CONNECTED:
+                            //setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
+                            //mConversationArrayAdapter.clear();
+                            sendShootInfo(1,1);
+                            break;
+                        case BluetoothService.STATE_CONNECTING:
+                            //setStatus(R.string.title_connecting);
+                            break;
+                        case BluetoothService.STATE_LISTEN:
+                        case BluetoothService.STATE_NONE:
+                            //setStatus(R.string.title_not_connected);
+                            break;
+                    }
+                    break;
+                case BluetoothService.MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+                    // construct a string from the buffer
+                    String writeMessage = new String(writeBuf);
+                    //mConversationArrayAdapter.add("Me:  " + writeMessage);
+                    Log.d("BTWrapperRead",writeMessage);
+                    break;
+                case BluetoothService.MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    Log.d("BTWrapperRead",readMessage);
+                    break;
+                case BluetoothService.MESSAGE_DEVICE_NAME:
+                    //TODO
+                case BluetoothService.UI_MESSAGE:
+                    //TODO
+                    break;
+            }
+        }
+    };
+
+    public Set<BluetoothDevice> getPairedDevices() {
+        return pairedDevices;
+    }
+
     Set<BluetoothDevice> pairedDevices;
     private BluetoothService BS;
 
     public BluetoothWrapper() {
         this.BA = BluetoothAdapter.getDefaultAdapter();
-        this.getPairedDevice();
+        this.updatePairedDevice();
         Log.d("BTWrapper","Setting Up BTAdapter");
     }
 
@@ -55,17 +104,9 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
         IntentFilter intent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         ctx.registerReceiver(mPairReceiver, intent);
     }
-    public void startBluetoothServer(){
-        if(this.BS!=null) {
-            this.BS.start();
-        }else{
-            this.BS = new BluetoothService(ctx,null);
-            this.BS.start();
-        }
-    }
     public BluetoothService getBluetoothService() {
         if(this.BS==null){
-            this.BS = new BluetoothService(ctx,null);
+            this.BS = new BluetoothService(mHandler);
         }
         return BS;
     }
@@ -85,16 +126,8 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
         return this.BA;
     }
 
-    private void getPairedDevice(){
+    private void updatePairedDevice(){
         this.pairedDevices = this.BA.getBondedDevices();
-        // If there are paired devices
-        if (this.pairedDevices.size() > 0) {
-            // Loop through paired devices
-            for (BluetoothDevice device : this.pairedDevices) {
-                // Add the name and address to an array adapter to show in a ListView
-               Log.d("BTWrapper",device.getName() + "\n" + device.getAddress());
-            }
-        }
     }
 
     public boolean checkIfPaired(String address){
@@ -142,7 +175,7 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
                 final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
                 final int prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
                 if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
-                    getPairedDevice();
+                    updatePairedDevice();
                     notifyObservers(BluetoothWrapper.NEW_PAIRED_DEVICE);
                     Toast.makeText(ctx,"Paired", Toast.LENGTH_LONG).show();
                 } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED){
@@ -152,53 +185,41 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
         }
     };
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case BluetoothService.MESSAGE_STATE_CHANGE:
-                    switch (msg.arg1) {
-                        case BluetoothService.STATE_CONNECTED:
-                            //setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-                            //mConversationArrayAdapter.clear();
-                            break;
-                        case BluetoothService.STATE_CONNECTING:
-                            //setStatus(R.string.title_connecting);
-                            break;
-                        case BluetoothService.STATE_LISTEN:
-                        case BluetoothService.STATE_NONE:
-                            //setStatus(R.string.title_not_connected);
-                            break;
-                    }
-                    break;
-                case BluetoothService.MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
-                    //mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    break;
-                case BluetoothService.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    //mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
-                    break;
-                case BluetoothService.MESSAGE_DEVICE_NAME:
-                    //TODO
-                case BluetoothService.UI_MESSAGE:
-                    //TODO
-                    break;
-            }
-        }
-    };
+
 
     @Override
     public void sendShootInfo(int r, int c) {
-        this.reciveShootInfo(Game.getGameBoard().Shoot(r,c));
+        Log.d("BTWrapper","Sending Shoot Info");
+        //this.reciveShootInfo(Game.getGameBoard().Shoot(r,c));
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out = null;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject("Test");
+            byte[] BytesObj = bos.toByteArray();
+            this.getBluetoothService().write(BytesObj);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+            try {
+                bos.close();
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
     }
 
     @Override
     public void reciveShootInfo(ShootResponse sr) {
         Game.getGameBoard().EnemyShootResponse(sr);
+
+
     }
 }
