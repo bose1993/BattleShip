@@ -53,6 +53,9 @@ public class BoatFactory {
             } catch (AlreadyExistingBoatException e) {
                 this.availableBoatDimension.push(dim);
                 throw new AlreadyExistingBoatException("Overlapping Boat");
+            }catch (BoatOutOfFieldException e){
+                this.availableBoatDimension.push(dim);
+                throw new BoatOutOfFieldException("Boat Out of Board");
             }
 
         }
