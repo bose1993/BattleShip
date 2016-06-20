@@ -68,10 +68,12 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
             case Field.SINK:
                 this.setBackgroundResource(android.R.drawable.btn_default_small);
                 this.setBackgroundColor(Color.RED);
+                this.setOnClickListener(null);
                 break;
             case Field.HITBOAT:
                 this.setBackgroundResource(android.R.drawable.btn_default_small);
                 this.setBackgroundColor(Color.YELLOW);
+                this.setOnClickListener(null);
                 break;
             case Field.BOAT:
                 this.setBackgroundResource(android.R.drawable.btn_default_small);
