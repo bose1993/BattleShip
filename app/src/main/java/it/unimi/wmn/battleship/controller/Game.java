@@ -56,6 +56,10 @@ public class Game {
         return br;
     }
 
-
+    public static void resetGame(){
+        gb = null;
+        bf = null;
+        br = null;
+    }
 
 }

@@ -25,6 +25,7 @@ public abstract class Constants {
     public static final int MESSAGE_WRITE = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
+    public static final int DISCONNECTED=6;
 
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
@@ -33,6 +34,7 @@ public abstract class Constants {
     //Observer Message
     public static final String NEW_PAIRED_DEVICE = "NEW_PAIRED_DEVICE";
     public static final String CONNECTION_SUCCESFUL = "CONNECTION_SUCCESFUL";
-
+    public static final String RESET_GAME = "RESET_GAME";
     public static final String GAME_STATUS_CHANGED = "GAME_STATUS_CHANGED";
+
 }

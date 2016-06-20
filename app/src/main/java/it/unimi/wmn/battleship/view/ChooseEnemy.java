@@ -31,9 +31,11 @@ public class ChooseEnemy extends AppCompatActivity implements Observer {
         listView = (ListView) findViewById(R.id.listView);
         deviceName = new ArrayList<>();
         bdevices = new ArrayList<>();
+        //Add obseerver for notification of connection established
         Game.getBluetoothWrapper().addObserver(this);
+        //Get a paired device and add it to the View
         for (BluetoothDevice device : Game.getBluetoothWrapper().getPairedDevices()) {
-            deviceName.add(device.getName());Log.d("ChooseEnemy",device.getName());
+            deviceName.add(device.getName());
             this.bdevices.add(device);
         }
         ArrayAdapter listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, deviceName);
@@ -41,6 +43,8 @@ public class ChooseEnemy extends AppCompatActivity implements Observer {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                //Set listener for onPressButton for start a connection
                 BluetoothDevice bd = bdevices.get(position);
                 Game.getBluetoothWrapper().getBluetoothService().connect(bd,false);
                 Log.d("ChooseEnemy","Press"+position);

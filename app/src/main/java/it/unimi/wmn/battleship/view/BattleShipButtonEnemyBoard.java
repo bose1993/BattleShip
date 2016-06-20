@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -38,6 +39,7 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
     int row;
     int column;
     String type;
+    Context ctx;
 
     BattleShipButtonEnemyBoard(final int row, final int column, String Type, Context ctx){
         super(ctx);
@@ -45,6 +47,7 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
         this.column = column;
         this.type = Type;
         this.callModel();
+        this.ctx = ctx;
         this.addListener(this);
     }
 
@@ -95,7 +98,13 @@ public class BattleShipButtonEnemyBoard extends Button implements Observer,Battl
                         e.printStackTrace();
                     }
                 }else if (type.equals(BattleShipButtonEnemyBoard.ENEMYBOARD)){
-                    Game.getGameBoard().sendShoot(row,column);
+                    if(Game.getGameBoard().getStatus()==GameBoard.STATUS_SHOOT){
+                        Game.getGameBoard().sendShoot(row,column);
+                    }else if(Game.getGameBoard().getStatus()==GameBoard.STATUS_BOAT_POSITIONING) {
+                        Toast.makeText(ctx,"Place all Boat first", Toast.LENGTH_SHORT).show();
+
+                    }
+
                 }
             }
         });

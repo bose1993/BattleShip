@@ -1,11 +1,13 @@
 package it.unimi.wmn.battleship.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -46,6 +48,7 @@ import it.unimi.wmn.battleship.controller.GameBoard;
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
+    private static final String TAG = "BattleBoardView";
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -125,6 +128,8 @@ import it.unimi.wmn.battleship.controller.GameBoard;
         this.CreateEnemyGridBattleBoard();
         super.onCreate(savedInstanceState);
     }
+
+
 
 
     private void CreateEnemyGridBattleBoard(){
@@ -237,8 +242,15 @@ import it.unimi.wmn.battleship.controller.GameBoard;
         if(Game.getBluetoothWrapper().getBluetoothService()!=null){
             Game.getBluetoothWrapper().getBluetoothService().stop();
         }
+
         super.onDestroy();
 
+    }
+
+    private void destroyGame(){
+        Game.resetGame();
+        Intent intent = new Intent(getApplicationContext(), Menu.class);
+        startActivity(intent);
     }
     @SuppressLint("InlinedApi")
     private void show() {
@@ -251,6 +263,10 @@ import it.unimi.wmn.battleship.controller.GameBoard;
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
     }
 
+    @Override
+    public void onBackPressed() {
+        this.destroyGame();
+    }
     /**
      * Schedules a call to hide() in [delay] milliseconds, canceling any
      * previously scheduled calls.
@@ -271,6 +287,9 @@ import it.unimi.wmn.battleship.controller.GameBoard;
                 Toast.makeText(getApplicationContext(),"In attesa dell'avversario", Toast.LENGTH_SHORT).show();
 
             }
+        }else if(data.equals(Constants.RESET_GAME)){
+            Log.d(TAG,"Notification of resetting view ");
+            destroyGame();
         }
     }
 }

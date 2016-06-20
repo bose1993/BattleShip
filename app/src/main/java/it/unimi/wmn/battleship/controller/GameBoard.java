@@ -45,7 +45,7 @@ public class GameBoard extends Observable {
     public static final int STATUS_DECIDE_FISRST_SHOOT = 1;
     public static final int STATUS_SHOOT = 2;
     public static final int STATUS_WAIT_SHOOT = 3;
-    public static final int STATUS_WAITING_SHOOT_RESPONSE = 4;
+    public static final int STATUS_ERROR_BT_DISCONNECTED = 4;
     public static final int STATUS_GAME_ENDED = 5;
 
     private Field[][] Board;
@@ -87,6 +87,12 @@ public class GameBoard extends Observable {
 
     }
 
+    public void resetGame(){
+        //Notify view to reset game and restart from Menu
+        Log.d(TAG,"Reset application in Controller");
+        this.setChanged();
+        this.notifyObservers(Constants.RESET_GAME);
+    }
     private void changeGameStatus(int status){
         Log.d(TAG,this.status+"-->"+status);
         this.status=status;
@@ -122,17 +128,12 @@ public class GameBoard extends Observable {
     }
 
     public void sendShoot(int r, int c){
-        if(this.status==GameBoard.STATUS_SHOOT){
-            if(Game.getBluetoothWrapper().getBluetoothService().getState()==BluetoothService.STATE_CONNECTED) {
-                Game.getBluetoothWrapper().sendShootInfo(r, c);
-            }else{
-                //Try to reconnect
-                Game.getBluetoothWrapper().getBluetoothService().connect(Game.getBluetoothWrapper().getBluetoothService().getConnectedDevice(),false);
-                Game.getBluetoothWrapper().sendShootInfo(r, c);
-            }
-
+        if(Game.getBluetoothWrapper().getBluetoothService().getState()==BluetoothService.STATE_CONNECTED) {
+            Game.getBluetoothWrapper().sendShootInfo(r, c);
         }else{
-            this.changeGameStatus(GameBoard.STATUS_WAIT_SHOOT);
+            //Try to reconnect
+            Game.getBluetoothWrapper().getBluetoothService().connect(Game.getBluetoothWrapper().getBluetoothService().getConnectedDevice(),false);
+            Game.getBluetoothWrapper().sendShootInfo(r, c);
         }
 
     }

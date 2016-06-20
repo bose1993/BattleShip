@@ -63,28 +63,26 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
                             notifyObservers(Constants.CONNECTION_SUCCESFUL);
                             break;
                         case BluetoothService.STATE_CONNECTING:
-                            //setStatus(R.string.title_connecting);
+                            //BT Service state connect
                             break;
                         case BluetoothService.STATE_LISTEN:
                         case BluetoothService.STATE_NONE:
-                            //setStatus(R.string.title_not_connected);
+                            //BT Service just initialized
                             break;
                     }
                     break;
                 case Constants.MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
-                    //mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    Log.d("BTWrapperWrite",writeMessage);
+                    // Message sent
                     break;
                 case Constants.MESSAGE_READ:
+                    //Message received
                     byte[] readBuf = (byte[]) msg.obj;
                     reciveInfo(readBuf);
-                    Log.d("BTWrapperRead",readBuf.toString());
                     break;
-                case Constants.MESSAGE_DEVICE_NAME:
-                    //TODO
+                case Constants.DISCONNECTED:
+                    Log.d(TAG,"Disconnecting notify by Handler");
+                    Game.getGameBoard().resetGame();
+                    break;
             }
         }
     };
@@ -109,7 +107,7 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
     }
     public BluetoothService getBluetoothService() {
         if(this.BS==null){
-            this.BS = new BluetoothService(ctx,mHandler);
+            this.BS = new BluetoothService(mHandler);
         }
         return BS;
     }
@@ -247,8 +245,6 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
             Log.d(TAG,"MESSAGE TYPE"+String.valueOf(o.getType()));
             Log.d(TAG,String.valueOf(o.getPayload()));
             this.doActivityIncomingMessage(o);
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
