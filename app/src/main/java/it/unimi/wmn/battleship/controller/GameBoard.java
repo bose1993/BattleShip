@@ -8,6 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeMap;
 
+import it.unimi.wmn.battleship.model.BluetoothMessage;
 import it.unimi.wmn.battleship.model.Boat;
 import it.unimi.wmn.battleship.model.Field;
 import it.unimi.wmn.battleship.model.RequestBoatOfEmptyFieldException;
@@ -168,6 +169,9 @@ public class GameBoard extends Observable {
                     sr = new ShootResponse(r,c,ShootResponse.SINK,b.getId());
                     Log.d(TAG,"Boat Sink");
                     if(this.isAllBoatSink()){
+                        BluetoothMessage bm = new BluetoothMessage();
+                        bm.setType(BluetoothMessage.NOTIFY_WIN);
+                        Game.getBluetoothWrapper().sendInfo(bm);
                         this.changeGameStatus(GameBoard.STATUS_GAME_ENDED_LOSE);
                     }
                 }else{
@@ -183,6 +187,9 @@ public class GameBoard extends Observable {
         }
     }
 
+    public void win(){
+        this.changeGameStatus(GameBoard.STATUS_GAME_ENDED_WIN);
+    }
     public void receiveEnemyShootResponse(ShootResponse sr){
         switch (sr.getStatus()) {
             case ShootResponse.HIT:

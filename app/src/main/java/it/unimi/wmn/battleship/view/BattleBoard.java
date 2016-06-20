@@ -290,7 +290,11 @@ import it.unimi.wmn.battleship.controller.GameBoard;
                 myToast.show();
 
             }else if(status == GameBoard.STATUS_GAME_ENDED_LOSE){
-                myToast.setText("Game Ober");
+                myToast.setText("Game Over");
+                myToast.show();
+                destroyGame();
+            }else if(status == GameBoard.STATUS_GAME_ENDED_WIN){
+                myToast.setText("You Win");
                 myToast.show();
                 destroyGame();
             }

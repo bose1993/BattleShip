@@ -275,6 +275,9 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
         }else if (bm.getType()==BluetoothMessage.SHOOT_RESPONSE){
             Log.d(TAG,"Receive Shoot Repsonse");
             Game.getGameBoard().receiveEnemyShootResponse(new ShootResponse(bm.getRow(),bm.getColumn(),bm.getShootStatus(),(Integer)bm.getPayload()));
+        }else if (bm.getType()==BluetoothMessage.NOTIFY_WIN){
+            Log.d(TAG,"Receive Shoot Repsonse");
+            Game.getGameBoard().win();
         }
     }
 }
