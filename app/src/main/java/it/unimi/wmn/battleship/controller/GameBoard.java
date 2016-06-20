@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Random;
 import java.util.TreeMap;
 
 import it.unimi.wmn.battleship.model.Boat;
 import it.unimi.wmn.battleship.model.Field;
 import it.unimi.wmn.battleship.model.RequestBoatOfEmptyFieldException;
 import it.unimi.wmn.battleship.model.ShootResponse;
-import it.unimi.wmn.battleship.view.BattleBoard;
 
 /**
  * Created by ebosetti on 09/06/2016.
@@ -45,11 +43,17 @@ public class GameBoard extends Observable {
     public static final int STATUS_DECIDE_FISRST_SHOOT = 1;
     public static final int STATUS_SHOOT = 2;
     public static final int STATUS_WAIT_SHOOT = 3;
-    public static final int STATUS_ERROR_BT_DISCONNECTED = 4;
-    public static final int STATUS_GAME_ENDED = 5;
+    public static final int STATUS_GAME_ENDED_WIN = 4;
+    public static final int STATUS_GAME_ENDED_LOSE = 5;
+
 
     private Field[][] Board;
     private Field[][] EmenyBoard;
+
+    public ArrayList<Boat> getBoatList() {
+        return BoatList;
+    }
+
     private ArrayList<Boat> BoatList;
     private Map<Integer, Boat> EnemyBoatList = new TreeMap<Integer, Boat>();
     private GameRoundManager grm;
@@ -116,6 +120,17 @@ public class GameBoard extends Observable {
         }
     }
 
+    private boolean isAllBoatSink(){
+        boolean foundOneNotSink=false;
+       for (int i=0;i<this.BoatList.size();i++){
+           Log.d(TAG,String.valueOf(this.BoatList.get(i).checkIfSink()));
+           if(!this.BoatList.get(i).checkIfSink()){
+               foundOneNotSink=true;
+           }
+       }
+        return !foundOneNotSink;
+    }
+
 
 
     public void receiveNonce(int nonce){
@@ -151,6 +166,10 @@ public class GameBoard extends Observable {
                 Boat b = this.Board[r][c].getBoat();
                 if(b.checkIfSink()){
                     sr = new ShootResponse(r,c,ShootResponse.SINK,b.getId());
+                    Log.d(TAG,"Boat Sink");
+                    if(this.isAllBoatSink()){
+                        this.changeGameStatus(GameBoard.STATUS_GAME_ENDED_LOSE);
+                    }
                 }else{
                     sr = new ShootResponse(r,c,ShootResponse.HIT,b.getId());
                 }

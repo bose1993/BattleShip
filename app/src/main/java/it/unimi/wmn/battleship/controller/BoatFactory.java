@@ -46,9 +46,9 @@ public class BoatFactory {
             Integer dim = this.availableBoatDimension.pop();
             try {
                 this.SetBoat(row, column, dim);
+
                 if(this.availableBoatDimension.empty()){
                     Game.getGameBoard().allBoatPositioned();
-
                 }
             } catch (AlreadyExistingBoatException e) {
                 this.availableBoatDimension.push(dim);
@@ -74,6 +74,7 @@ public class BoatFactory {
                 gb.ChangeFieldStatus(r, c + i,Field.BOAT,b);
                 b.setField( gb.getField(r,c+i,GameBoard.MYBOARD));
             }
+            Game.getGameBoard().getBoatList().add(b);
         }catch (IndexOutOfBoundsException e){
             b.deleteBoat();
             throw new BoatOutOfFieldException("Boat is out of Field");

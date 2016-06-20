@@ -62,7 +62,7 @@ public class Boat {
         if(this.BoatDim != -1) {
             int hittedNum = 0;
             for (int i = 0; i < this.BoardFiled.size(); i++) {
-                if (this.BoardFiled.get(i).getField() == Field.HITBOAT) {
+                if (this.BoardFiled.get(i).getField() == Field.HITBOAT || this.BoardFiled.get(i).getField() == Field.SINK) {
                     hittedNum++;
                 }
             }

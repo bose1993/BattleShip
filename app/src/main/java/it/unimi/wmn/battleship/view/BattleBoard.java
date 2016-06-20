@@ -50,6 +50,7 @@ import it.unimi.wmn.battleship.controller.GameBoard;
     private static final boolean AUTO_HIDE = true;
     private static final String TAG = "BattleBoardView";
 
+
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -62,9 +63,8 @@ import it.unimi.wmn.battleship.controller.GameBoard;
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private View mContentView;
+    private Toast myToast;
     GridLayout gridLayout;
-    private Game game;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -123,6 +123,7 @@ import it.unimi.wmn.battleship.controller.GameBoard;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_battle_board);
+        myToast = Toast.makeText(getBaseContext(), "", Toast.LENGTH_SHORT);
         Game.getGameBoard().addObserver(this);
         this.CreateGridofBattleBoard();
         this.CreateEnemyGridBattleBoard();
@@ -281,14 +282,22 @@ import it.unimi.wmn.battleship.controller.GameBoard;
         if(data.equals(Constants.GAME_STATUS_CHANGED)){
             int status = Game.getGameBoard().getStatus();
             if(status == GameBoard.STATUS_SHOOT){
-                Toast.makeText(getApplicationContext(),"Tocca a te sparare", Toast.LENGTH_LONG).show();
+                myToast.setText("Tocca a te sparare");
+                myToast.show();
 
             }else if(status == GameBoard.STATUS_WAIT_SHOOT){
-                Toast.makeText(getApplicationContext(),"In attesa dell'avversario", Toast.LENGTH_SHORT).show();
+                myToast.setText("In attesa dell'avversario");
+                myToast.show();
 
+            }else if(status == GameBoard.STATUS_GAME_ENDED_LOSE){
+                myToast.setText("Game Ober");
+                myToast.show();
+                destroyGame();
             }
         }else if(data.equals(Constants.RESET_GAME)){
             Log.d(TAG,"Notification of resetting view ");
+            myToast.setText("Connection lost or reset");
+            myToast.show();
             destroyGame();
         }
     }
