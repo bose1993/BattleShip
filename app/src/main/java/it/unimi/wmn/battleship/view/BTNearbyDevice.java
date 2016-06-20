@@ -46,7 +46,7 @@ public class BTNearbyDevice extends AppCompatActivity implements Observer {
         registerReceiver(mReceiver, filter);
         IntentFilter discoveryFinisced = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mDiscFinisched, discoveryFinisced);
-        this.listAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, mDeviceList);
+        this.listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, mDeviceList);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

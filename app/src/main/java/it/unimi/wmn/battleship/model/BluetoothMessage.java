@@ -21,10 +21,14 @@ import java.io.Serializable;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class BluetoothMessage implements Serializable {
+    /**
+     * This class provide a data structure for a bluetooth message exchanged bby the application
+     */
+
+    //Type of the message
     public static final int DECIDE_FIRST_SHOOT = 0;
     public static final int SHOOT = 1;
     public static final int SHOOT_RESPONSE = 2;
-
 
     private int type;
     private int column;
@@ -32,41 +36,83 @@ public class BluetoothMessage implements Serializable {
     private int shootStatus;
     private Object Payload;
 
+    /**
+     * Getter for the payload
+     * @return Object
+     */
     public Object getPayload() {
         return Payload;
     }
 
+    /**
+     * Setter for the payload
+     * @param payload
+     */
     public void setPayload(Object payload) {
         Payload = payload;
     }
+
+    /**
+     * Getter for the shoot status
+     * @return int (Shoot Status)
+     */
 
     public int getShootStatus() {
         return shootStatus;
     }
 
+    /**
+     * Setter for the shoot status
+     * @param shootStatus
+     */
     public void setShootStatus(int shootStatus) {
         this.shootStatus = shootStatus;
     }
 
+    /**
+     * Getter for row
+     * @return int row
+     */
     public int getRow() {
         return row;
     }
 
+    /**
+     * Setter for row
+     * @param row
+     */
     public void setRow(int row) {
         this.row = row;
     }
 
+    /**
+     * Getter for column
+     * @return int column
+     */
     public int getColumn() {
         return column;
     }
 
+    /**
+     * Setter for column
+     * @param column
+     */
     public void setColumn(int column) {
         this.column = column;
     }
 
+    /**
+     * Getter for type
+     * @return int type
+     */
     public int getType() {
         return type;
     }
+
+    /**
+     * Setter for type
+     * @param type int
+     */
 
     public void setType(int type) {
         this.type = type;

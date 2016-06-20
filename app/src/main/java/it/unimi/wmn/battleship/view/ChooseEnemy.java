@@ -36,7 +36,7 @@ public class ChooseEnemy extends AppCompatActivity implements Observer {
             deviceName.add(device.getName());Log.d("ChooseEnemy",device.getName());
             this.bdevices.add(device);
         }
-        ArrayAdapter<String> listAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, deviceName);
+        ArrayAdapter listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, deviceName);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
