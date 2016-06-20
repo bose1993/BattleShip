@@ -52,7 +52,6 @@ public class GameBoard extends Observable {
     private Field[][] EmenyBoard;
     private ArrayList<Boat> BoatList;
     private Map<Integer, Boat> EnemyBoatList = new TreeMap<Integer, Boat>();
-
     private GameRoundManager grm;
 
     public int getStatus() {
@@ -123,8 +122,14 @@ public class GameBoard extends Observable {
     }
 
     public void sendShoot(int r, int c){
-        if(this.status== GameBoard.STATUS_SHOOT){
-            Game.getBluetoothWrapper().sendShootInfo(r,c);
+        if(this.status==GameBoard.STATUS_SHOOT){
+            if(Game.getBluetoothWrapper().getBluetoothService().getState()==BluetoothService.STATE_CONNECTED) {
+                Game.getBluetoothWrapper().sendShootInfo(r, c);
+            }else{
+                //Try to reconnect
+                Game.getBluetoothWrapper().getBluetoothService().connect(Game.getBluetoothWrapper().getBluetoothService().getConnectedDevice(),false);
+                Game.getBluetoothWrapper().sendShootInfo(r, c);
+            }
 
         }else{
             this.changeGameStatus(GameBoard.STATUS_WAIT_SHOOT);

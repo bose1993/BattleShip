@@ -64,6 +64,13 @@ public class BluetoothService {
     private ConnectedThread mConnectedThread;
     private int mState;
 
+    public BluetoothDevice getConnectedDevice() {
+        return connectedDevice;
+    }
+
+    private BluetoothDevice connectedDevice;
+
+
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
@@ -142,7 +149,7 @@ public class BluetoothService {
      */
     public synchronized void connect(BluetoothDevice device, boolean secure) {
         Log.d(TAG, "connect to: " + device);
-
+        connectedDevice = device;
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
             if (mConnectThread != null) {
