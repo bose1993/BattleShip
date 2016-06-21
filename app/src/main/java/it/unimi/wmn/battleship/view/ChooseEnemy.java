@@ -15,7 +15,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import it.unimi.wmn.battleship.R;
-import it.unimi.wmn.battleship.controller.BluetoothWrapper;
 import it.unimi.wmn.battleship.controller.Constants;
 import it.unimi.wmn.battleship.controller.Game;
 

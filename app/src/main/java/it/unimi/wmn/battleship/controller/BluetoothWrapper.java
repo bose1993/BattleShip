@@ -19,7 +19,6 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.lang.reflect.Method;
 import java.util.Observable;
 import java.util.Set;
@@ -206,8 +205,6 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
 
     @Override
     public void sendInfo(BluetoothMessage m) {
-
-        //TODO Make this method private & check where used
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
         try {
@@ -245,9 +242,7 @@ public class BluetoothWrapper extends Observable implements BattleshipComunicati
             Log.d(TAG,"MESSAGE TYPE"+String.valueOf(o.getType()));
             Log.d(TAG,String.valueOf(o.getPayload()));
             this.doActivityIncomingMessage(o);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {

@@ -39,7 +39,7 @@ public class GameRoundManager {
     public void sendNonce(){
         BluetoothMessage m = new BluetoothMessage();
         m.setType(BluetoothMessage.DECIDE_FIRST_SHOOT);
-        m.setPayload(new Integer(this.MyNonce));
+        m.setPayload(this.MyNonce);
         if(Game.getBluetoothWrapper().getBluetoothService().getState()== BluetoothService.STATE_CONNECTED){
             Game.getBluetoothWrapper().sendInfo(m);
         }else{
@@ -62,10 +62,6 @@ public class GameRoundManager {
         }
     }
     public boolean existEnemyNonce(){
-        if (this.EnemyNonce==-1){
-            return false;
-        }else {
-            return true;
-        }
+        return this.EnemyNonce != -1;
     }
 }

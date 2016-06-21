@@ -27,7 +27,7 @@ import it.unimi.wmn.battleship.model.Field;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class BoatFactory {
-    Stack<Integer> availableBoatDimension = new Stack<Integer>();
+    Stack<Integer> availableBoatDimension = new Stack<>();
     GameBoard gb;
 
     public BoatFactory(){

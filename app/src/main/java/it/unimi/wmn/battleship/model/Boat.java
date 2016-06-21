@@ -1,7 +1,6 @@
 package it.unimi.wmn.battleship.model;
 
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
 
 /**
  * Created by ebosetti on 13/06/2016.

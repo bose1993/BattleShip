@@ -1,9 +1,5 @@
 package it.unimi.wmn.battleship.controller;
 
-import android.content.Intent;
-
-import it.unimi.wmn.battleship.view.BattleBoard;
-
 /**
  * Created by ebosetti on 09/06/2016.
  *
@@ -26,9 +22,6 @@ public class Game {
     private static GameBoard gb = null;
     private static BoatFactory bf = null;
     private static BluetoothWrapper br = null;
-    void Game(){
-
-    }
 
 
     /**

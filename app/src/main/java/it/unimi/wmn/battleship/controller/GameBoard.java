@@ -36,7 +36,6 @@ public class GameBoard extends Observable {
 
     private static final String TAG = "GameBoard";
 
-    public static final String ENEMYBOARD = "EB";
     public static final String MYBOARD = "MB";
 
 
@@ -56,7 +55,7 @@ public class GameBoard extends Observable {
     }
 
     private ArrayList<Boat> BoatList;
-    private Map<Integer, Boat> EnemyBoatList = new TreeMap<Integer, Boat>();
+    private Map<Integer, Boat> EnemyBoatList = new TreeMap<>();
     private GameRoundManager grm;
 
     public int getStatus() {

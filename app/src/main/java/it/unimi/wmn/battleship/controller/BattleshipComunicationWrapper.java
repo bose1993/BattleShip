@@ -1,7 +1,6 @@
 package it.unimi.wmn.battleship.controller;
 
 import it.unimi.wmn.battleship.model.BluetoothMessage;
-import it.unimi.wmn.battleship.model.ShootResponse;
 
 /**
  * Created by ebosetti on 16/06/2016.
@@ -23,8 +22,8 @@ import it.unimi.wmn.battleship.model.ShootResponse;
  */
 public interface BattleshipComunicationWrapper {
 
-    public void sendInfo(BluetoothMessage m);
+    void sendInfo(BluetoothMessage m);
 
-    public BluetoothMessage reciveInfo(byte[] b);
+    BluetoothMessage reciveInfo(byte[] b);
 
 }
