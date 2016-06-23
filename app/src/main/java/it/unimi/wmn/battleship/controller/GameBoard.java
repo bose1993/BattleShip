@@ -117,6 +117,8 @@ public class GameBoard extends Observable {
             //Check if enemy has just set all boat & send nonce or wait
             int round = this.grm.getRound();
             this.changeGameStatus(round);
+        }else{
+            Log.d(TAG,"Existing Enemy Nonce");
         }
     }
 

@@ -95,7 +95,7 @@ public class BluetoothService {
     private synchronized void setState(int state) {
         Log.d(TAG, "setState() " + mState + " -> " + state);
         mState = state;
-
+        Log.d(TAG, "setState() New State " + mState);
         // Give the new state to the Handler so the UI Activity can update
         mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
@@ -254,7 +254,10 @@ public class BluetoothService {
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
+            if (mState != STATE_CONNECTED){
+                Log.e(TAG,"Not connected Socket");
+                return;
+            }
             r = mConnectedThread;
         }
         // Perform the write unsynchronized
@@ -288,7 +291,7 @@ public class BluetoothService {
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothService.this.start();
+
     }
 
     /**

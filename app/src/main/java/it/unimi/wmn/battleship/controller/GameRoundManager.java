@@ -40,11 +40,11 @@ public class GameRoundManager {
         BluetoothMessage m = new BluetoothMessage();
         m.setType(BluetoothMessage.DECIDE_FIRST_SHOOT);
         m.setPayload(this.MyNonce);
-        if(Game.getBluetoothWrapper().getBluetoothService().getState()== BluetoothService.STATE_CONNECTED){
+        //if(Game.getBluetoothWrapper().getBluetoothService().getState()== BluetoothService.STATE_CONNECTED){
             Game.getBluetoothWrapper().sendInfo(m);
-        }else{
-            Log.d(TAG,"Error Socket not connected");
-        }
+        //}else{
+          // Log.d(TAG,"Error Socket not connected status "+Game.getBluetoothWrapper().getBluetoothService().getState());
+        //}
     }
 
     public void setEnemyNonce(int nonce){

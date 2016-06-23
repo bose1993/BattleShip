@@ -281,11 +281,11 @@ import it.unimi.wmn.battleship.controller.GameBoard;
         if(data.equals(Constants.GAME_STATUS_CHANGED)){
             int status = Game.getGameBoard().getStatus();
             if(status == GameBoard.STATUS_SHOOT){
-                myToast.setText("Tocca a te sparare");
+                myToast.setText("Shoot Now");
                 myToast.show();
 
             }else if(status == GameBoard.STATUS_WAIT_SHOOT){
-                myToast.setText("In attesa dell'avversario");
+                myToast.setText("Waiting Enemy");
                 myToast.show();
 
             }else if(status == GameBoard.STATUS_GAME_ENDED_LOSE){

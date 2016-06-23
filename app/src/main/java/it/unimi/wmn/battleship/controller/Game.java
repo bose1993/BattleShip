@@ -50,6 +50,7 @@ public class Game {
     }
 
     public static void resetGame(){
+        br.getBluetoothService().stop();
         gb = null;
         bf = null;
         br = null;
